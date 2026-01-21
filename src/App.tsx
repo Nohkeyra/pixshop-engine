@@ -120,6 +120,10 @@ export const App: React.FC = () => {
     }, [history, historyIndex]);
 
     const handleImageUpload = useCallback((file: File) => {
+        if (!file) {
+            setError("UPLOAD_FAULT: No file provided.");
+            return;
+        }
         setError(null);
         setViewerInstruction(null);
         audioService.playClick();
@@ -128,8 +132,8 @@ export const App: React.FC = () => {
             setHistoryIndex(newHistory.length - 1);
             return newHistory;
         });
-        setActiveTab('flux'); // Default to flux panel after upload
-        setFluxPrompt(''); // Clear flux prompt on new upload
+        setActiveTab('flux'); 
+        setFluxPrompt(''); 
     }, [historyIndex]);
 
     const handleGenerate = useCallback(async (request: GenerationRequest) => {

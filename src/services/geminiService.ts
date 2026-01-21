@@ -8,7 +8,8 @@ import { ImageModel } from '../context/AppContext'; // Import ImageModel type
 
 // Factory to always get the freshest instance
 const getAiClient = () => {
-    const apiKey = process.env.API_KEY;
+    const apiKey = 
+        import.meta.env.VITE_API_KEY;
     if (!apiKey) {
         throw new Error("NEURAL_LINK_NULL: Authentication key missing. Initialize via System Config.");
     }
@@ -52,17 +53,28 @@ const fileToPart = async (file: File | string, setViewerInstruction?: (text: str
     
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.readAsDataURL(file);
         reader.onload = () => {
             if (setViewerInstruction) setViewerInstruction("UPLOADING_VOXEL_MAP...");
             const result = reader.result as string;
-            const base64Data = result.split(',')[1] || ''; // Ensure it's an empty string if no data part
+            if (!result || !result.includes(',')) {
+                console.error("FileReader result is invalid:", result);
+                reject(new Error("IO_FAULT: Image sequence corrupted during read (invalid result)."));
+                return;
+            }
+            const base64Data = result.split(',')[1] || ''; 
             resolve({ inlineData: { mimeType: file.type, data: base64Data } });
         };
         reader.onerror = (errorEvent) => {
-            console.error("FileReader error during readAsDataURL:", errorEvent.target?.error);
-            reject(new Error("IO_FAULT: Image sequence corrupted during read."));
+            const error = reader.error || errorEvent;
+            console.error("FileReader error during readAsDataURL:", error);
+            reject(new Error(`IO_FAULT: Image sequence corrupted during read (${error.toString()}).`));
         };
+        try {
+            reader.readAsDataURL(file);
+        } catch (e: any) {
+            console.error("FileReader readAsDataURL throw:", e);
+            reject(new Error(`IO_FAULT: Image sequence corrupted during read (${e.message}).`));
+        }
     });
 };
 
