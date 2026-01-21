@@ -8,7 +8,7 @@ import { ImageModel } from '../context/AppContext'; // Import ImageModel type
 
 // Factory to always get the freshest instance
 const getAiClient = () => {
-    const apiKey = (import.meta as any).env?.VITE_API_KEY || (process.env as any).API_KEY;
+    const apiKey = (import.meta as any).env.VITE_API_KEY || (process.env as any).API_KEY;
     if (!apiKey) {
         throw new Error("NEURAL_LINK_NULL: Authentication key missing. Initialize via System Config.");
     }
