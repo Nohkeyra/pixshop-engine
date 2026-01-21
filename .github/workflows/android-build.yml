@@ -1,9 +1,7 @@
-name: Android CI
+name: Replit Android Build
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
     branches: [ "main" ]
 
 jobs:
@@ -21,14 +19,14 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Grant Execute Permission for Gradlew
+    - name: Grant Execute Permission
       run: chmod +x gradlew
 
-    - name: Build Debug APK
-      run: ./gradlew assembleDebug
+    - name: Build with Gradle
+      run: ./gradlew assembleDebug --stacktrace
 
-    - name: Upload APK Artifact
+    - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: pixshop-engine-debug-apk
-        path: app/build/outputs/apk/debug/*.apk
+        name: pixshop-engine-replit-build
+        path: "**/build/outputs/apk/debug/*.apk"
