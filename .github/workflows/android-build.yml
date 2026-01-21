@@ -19,9 +19,14 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: wrapper
+
     - name: Find and Build APK
       run: |
-        # Search for the gradlew file and store its directory
+        # Locate the gradlew file
         GRADLEW_PATH=$(find . -name gradlew | head -n 1)
         
         if [ -z "$GRADLEW_PATH" ]; then
@@ -32,9 +37,15 @@ jobs:
         GRADLEW_DIR=$(dirname "$GRADLEW_PATH")
         echo "Found gradlew in: $GRADLEW_DIR"
         
-        # Grant permissions and build
+        # Grant permissions
         chmod +x "$GRADLEW_PATH"
-        cd "$GRADLEW_DIR" && ./gradlew assembleDebug
+        
+        # Execute the build with performance flags
+        cd "$GRADLEW_DIR" && ./gradlew assembleDebug \
+          --warning-mode all \
+          --no-daemon \
+          --parallel \
+          --build-cache
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
