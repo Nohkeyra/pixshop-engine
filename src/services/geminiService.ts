@@ -8,7 +8,7 @@ import { ImageModel } from '../context/AppContext';
 
 // Factory to always get the freshest instance
 const getAiClient = () => {
-    // Cast import.meta to any to fix TS2339 error
+    // Cast to any to fix TS2339 and access Vite environment variables
     const apiKey = (import.meta as any).env?.VITE_API_KEY;
     
     if (!apiKey) {
@@ -38,10 +38,18 @@ export interface ImageGenerationConfig {
     useGoogleSearch?: boolean;
 }
 
+// Unified response type for image generation
 interface ImageGenerationResult {
     imageUrl: string;
     groundingUrls?: { uri: string; title?: string }[];
 }
+
+// --- FIX START: Explicitly Export RoutedStyle ---
+export interface RoutedStyle {
+    target_panel_id: 'filter_panel' | 'vector_art_panel' | 'typographic_panel';
+    preset_data: { name: string; description: string; prompt: string; };
+}
+// --- FIX END ---
 
 const fileToPart = async (file: File | string, setViewerInstruction?: (text: string | null) => void): Promise<{ inlineData: { mimeType: string; data: string; } }> => {
     if (typeof file === 'string') {
@@ -242,4 +250,3 @@ export const describeImageForPrompt = async (imageFile: File | string, setViewer
     });
     return response.text || "";
 };
-    
