@@ -1,54 +1,76 @@
 apply plugin: 'com.android.application'
 
+// This block resolves the "Duplicate class" error by excluding old Kotlin modules
+// that are now bundled into the standard library in modern versions.
+configurations {
+    all {
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+    }
+}
+
 android {
-    namespace "com.pixshop.app"
-    compileSdk rootProject.ext.compileSdkVersion
+    [span_0](start_span)namespace "com.pixshop.app"[span_0](end_span)
+    [span_1](start_span)compileSdk rootProject.ext.compileSdkVersion[span_1](end_span)
+    
     defaultConfig {
-        applicationId "com.pixshop.app"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        [span_2](start_span)applicationId "com.pixshop.app"[span_2](end_span)
+        [span_3](start_span)minSdkVersion rootProject.ext.minSdkVersion[span_3](end_span)
+        [span_4](start_span)targetSdkVersion rootProject.ext.targetSdkVersion[span_4](end_span)
+        [span_5](start_span)versionCode 1[span_5](end_span)
+        [span_6](start_span)versionName "1.0"[span_6](end_span)
+        [span_7](start_span)testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"[span_7](end_span)
+        
         aaptOptions {
-             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
-             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
-            ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+            // Files and dirs to omit from the packaged assets dir
+            [span_8](start_span)ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'[span_8](end_span)
         }
     }
+
+    compileOptions {
+        [span_9](start_span)sourceCompatibility JavaVersion.VERSION_21[span_9](end_span)
+        [span_10](start_span)targetCompatibility JavaVersion.VERSION_21[span_10](end_span)
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            [span_11](start_span)minifyEnabled false[span_11](end_span)
+            [span_12](start_span)proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'[span_12](end_span)
         }
     }
 }
 
 repositories {
-    flatDir{
-        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    flatDir {
+        [span_13](start_span)dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'[span_13](end_span)
     }
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
-    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
-    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
-    implementation project(':capacitor-android')
-    testImplementation "junit:junit:$junitVersion"
-    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
-    implementation project(':capacitor-cordova-android-plugins')
+    [span_14](start_span)implementation fileTree(include: ['*.jar'], dir: 'libs')[span_14](end_span)
+    [span_15](start_span)implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"[span_15](end_span)
+    [span_16](start_span)implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"[span_16](end_span)
+    [span_17](start_span)implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"[span_17](end_span)
+    [span_18](start_span)implementation project(':capacitor-android')[span_18](end_span)
+    [span_19](start_span)testImplementation "junit:junit:$junitVersion"[span_19](end_span)
+    [span_20](start_span)androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"[span_20](end_span)
+    [span_21](start_span)androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"[span_21](end_span)
+    [span_22](start_span)implementation project(':capacitor-cordova-android-plugins')[span_22](end_span)
+    
+    // Capacitor dependencies automatically included from the generated file
+    [span_23](start_span)implementation project(':capacitor-app')[span_23](end_span)
+    [span_24](start_span)implementation project(':capacitor-haptics')[span_24](end_span)
+    [span_25](start_span)implementation project(':capacitor-keyboard')[span_25](end_span)
+    [span_26](start_span)implementation project(':capacitor-status-bar')[span_26](end_span)
 }
 
-apply from: 'capacitor.build.gradle'
+[span_27](start_span)apply from: 'capacitor.build.gradle'[span_27](end_span)
 
 try {
-    def servicesJSON = file('google-services.json')
-    if (servicesJSON.text) {
-        apply plugin: 'com.google.gms.google-services'
+    [span_28](start_span)def servicesJSON = file('google-services.json')[span_28](end_span)
+    [span_29](start_span)if (servicesJSON.text) {[span_29](end_span)
+        [span_30](start_span)apply plugin: 'com.google.gms.google-services'[span_30](end_span)
     }
 } catch(Exception e) {
-    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+    [span_31](start_span)logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")[span_31](end_span)
 }
