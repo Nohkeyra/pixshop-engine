@@ -141,8 +141,8 @@ export const generateFluxTextToImage = async (prompt: string, config?: ImageGene
         imageConfig: { aspectRatio: (config?.aspectRatio || '1:1') as any }
     };
     if (config?.useGoogleSearch) {
-        // googleSearch tool is only available for gemini-3-pro-image-preview
-        if (model === 'gemini-3-pro-image-preview') {
+        // googleSearch tool is only available for gemini-1.5-pro
+        if (model === 'gemini-1.5-pro') {
             generationConfig.tools = [{googleSearch: {}}];
         } else {
             console.warn("Google Search grounding requested but not supported by selected model:", model);
@@ -168,8 +168,8 @@ export const generateFluxImage = async (source: File | string, prompt: string, c
         imageConfig: { aspectRatio: (config?.aspectRatio || '1:1') as any }
     };
     if (config?.useGoogleSearch) {
-        // googleSearch tool is only available for gemini-3-pro-image-preview
-        if (model === 'gemini-3-pro-image-preview') {
+        // googleSearch tool is only available for gemini-1.5-pro
+        if (model === 'gemini-1.5-pro') {
             generationConfig.tools = [{googleSearch: {}}];
         } else {
             console.warn("Google Search grounding requested but not supported by selected model:", model);
@@ -195,8 +195,8 @@ export const generateFilteredImage = async (source: File | string, prompt: strin
         imageConfig: { aspectRatio: (config?.aspectRatio || '1:1') as any }
     };
     if (config?.useGoogleSearch) {
-        // googleSearch tool is only available for gemini-3-pro-image-preview
-        if (model === 'gemini-3-pro-image-preview') {
+        // googleSearch tool is only available for gemini-1.5-pro
+        if (model === 'gemini-1.5-pro') {
             generationConfig.tools = [{googleSearch: {}}];
         } else {
             console.warn("Google Search grounding requested but not supported by selected model:", model);
