@@ -221,8 +221,8 @@ export const extractStyleFromImage = async (imageFile: File | string, setViewerI
     const ai = getAiClient();
     const imagePart = await fileToPart(imageFile, setViewerInstruction);
     const response = await ai.models.generateContent({
-        // Always use gemini-3-flash-preview for text reasoning (free tier compatible)
-        model: 'gemini-3-flash-preview',
+        // Always use gemini-3-flash for text reasoning (free tier compatible)
+        model: 'gemini-3-flash',
         contents: { parts: [{ text: "Extract Visual DNA and route to target module." }, imagePart] },
         config: {
             systemInstruction: PROTOCOLS.STYLE_ROUTER,
@@ -249,8 +249,8 @@ export const describeImageForPrompt = async (imageFile: File | string, setViewer
     const ai = getAiClient();
     const imagePart = await fileToPart(imageFile, setViewerInstruction);
     const response = await ai.models.generateContent({
-        // Always use gemini-3-flash-preview for text reasoning (free tier compatible)
-        model: 'gemini-3-flash-preview',
+        // Always use gemini-3-flash for text reasoning (free tier compatible)
+        model: 'gemini-3-flash',
         contents: { parts: [{ text: "Describe the core subject and aesthetic of this image for a synthesis prompt." }, imagePart] },
     });
     return response.text || "";
