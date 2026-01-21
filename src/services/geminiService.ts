@@ -4,15 +4,15 @@
  */
 
 import { GoogleGenAI, GenerateContentResponse, Type } from "@google/genai";
-import { ImageModel } from '../context/AppContext'; // Import ImageModel type
+import { ImageModel } from '../context/AppContext';
 
 // Factory to always get the freshest instance
 const getAiClient = () => {
-    // Correct Vite syntax for environment variables
-    const apiKey = import.meta.env.VITE_API_KEY;
+    // Cast import.meta to any to fix TS2339 error
+    const apiKey = (import.meta as any).env?.VITE_API_KEY;
     
     if (!apiKey) {
-        throw new Error("NEURAL_LINK_NULL: Authentication key missing. Ensure VITE_API_KEY is set in Replit Secrets or GitHub Secrets.");
+        throw new Error("NEURAL_LINK_NULL: Authentication key missing. Initialize via System Config.");
     }
     return new GoogleGenAI({ apiKey });
 };
@@ -28,17 +28,16 @@ export const PROTOCOLS = {
 };
 
 export interface ImageGenerationConfig {
-    model?: ImageModel; // Add model parameter to config
+    model?: ImageModel;
     aspectRatio?: string;
     isChaos?: boolean;
     systemInstructionOverride?: string;
     negativePrompt?: string; 
     denoisingInstruction?: string; 
-    setViewerInstruction?: (text: string | null) => void; // New prop for granular feedback
-    useGoogleSearch?: boolean; // New prop for grounding
+    setViewerInstruction?: (text: string | null) => void;
+    useGoogleSearch?: boolean;
 }
 
-// Unified response type for image generation
 interface ImageGenerationResult {
     imageUrl: string;
     groundingUrls?: { uri: string; title?: string }[];
@@ -48,7 +47,7 @@ const fileToPart = async (file: File | string, setViewerInstruction?: (text: str
     if (typeof file === 'string') {
         const parts = file.split(',');
         const mimeType = parts[0].match(/:(.*?);/)?.[1] || 'image/png';
-        const base64Data = parts.length > 1 ? parts[1] : ''; // Ensure it's an empty string if no data part
+        const base64Data = parts.length > 1 ? parts[1] : '';
         return { inlineData: { mimeType, data: base64Data } };
     }
     
@@ -110,11 +109,10 @@ export const refineImagePrompt = async (prompt: string, useDeepThinking?: boolea
     try {
         if (setViewerInstruction) setViewerInstruction("REFINING_PROMPT_GRAMMAR...");
         const ai = getAiClient();
-        // Always use gemini-3-flash for text reasoning (free tier compatible)
         const model = 'gemini-3-flash'; 
         
         const config: any = {};
-        if (useDeepThinking) { // useDeepThinking can still be used to enable deeper thinking for flash model
+        if (useDeepThinking) {
             config.thinkingConfig = { thinkingBudget: 2048 };
         }
 
@@ -136,14 +134,12 @@ export const refineImagePrompt = async (prompt: string, useDeepThinking?: boolea
 export const generateFluxTextToImage = async (prompt: string, config?: ImageGenerationConfig): Promise<ImageGenerationResult> => {
     if (config?.setViewerInstruction) config.setViewerInstruction("GENERATING_FLUX_FROM_TEXT...");
     const ai = getAiClient();
-    // Use model from config, fallback to gemini-3-flash
     const model = config?.model || 'gemini-3-flash'; 
     const generationConfig: any = {
         systemInstruction: config?.systemInstructionOverride || PROTOCOLS.ARTIST,
         imageConfig: { aspectRatio: (config?.aspectRatio || '1:1') as any }
     };
     if (config?.useGoogleSearch) {
-        // googleSearch tool is only available for gemini-2.0-pro-exp-02-05
         if (model === 'gemini-2.0-pro-exp-02-05') {
             generationConfig.tools = [{googleSearch: {}}];
         } else {
@@ -162,7 +158,6 @@ export const generateFluxTextToImage = async (prompt: string, config?: ImageGene
 export const generateFluxImage = async (source: File | string, prompt: string, config?: ImageGenerationConfig): Promise<ImageGenerationResult> => {
     if (config?.setViewerInstruction) config.setViewerInstruction("TRANSFORMING_VISUAL_FLUX...");
     const ai = getAiClient();
-    // Use model from config, fallback to gemini-3-flash
     const model = config?.model || 'gemini-3-flash';
     const imagePart = await fileToPart(source, config?.setViewerInstruction);
     const generationConfig: any = {
@@ -170,7 +165,6 @@ export const generateFluxImage = async (source: File | string, prompt: string, c
         imageConfig: { aspectRatio: (config?.aspectRatio || '1:1') as any }
     };
     if (config?.useGoogleSearch) {
-        // googleSearch tool is only available for gemini-2.0-pro-exp-02-05
         if (model === 'gemini-2.0-pro-exp-02-05') {
             generationConfig.tools = [{googleSearch: {}}];
         } else {
@@ -189,7 +183,6 @@ export const generateFluxImage = async (source: File | string, prompt: string, c
 export const generateFilteredImage = async (source: File | string, prompt: string, config?: ImageGenerationConfig): Promise<ImageGenerationResult> => {
     if (config?.setViewerInstruction) config.setViewerInstruction("APPLYING_NEURAL_FILTERS...");
     const ai = getAiClient();
-    // Use model from config, fallback to gemini-3-flash
     const model = config?.model || 'gemini-3-flash';
     const imagePart = await fileToPart(source, config?.setViewerInstruction);
     const generationConfig: any = {
@@ -197,7 +190,6 @@ export const generateFilteredImage = async (source: File | string, prompt: strin
         imageConfig: { aspectRatio: (config?.aspectRatio || '1:1') as any }
     };
     if (config?.useGoogleSearch) {
-        // googleSearch tool is only available for gemini-2.0-pro-exp-02-05
         if (model === 'gemini-2.0-pro-exp-02-05') {
             generationConfig.tools = [{googleSearch: {}}];
         } else {
@@ -213,17 +205,11 @@ export const generateFilteredImage = async (source: File | string, prompt: strin
     return handleApiResponse(response, config?.setViewerInstruction);
 };
 
-export interface RoutedStyle {
-    target_panel_id: 'filter_panel' | 'vector_art_panel' | 'typographic_panel';
-    preset_data: { name: string; description: string; prompt: string; };
-}
-
 export const extractStyleFromImage = async (imageFile: File | string, setViewerInstruction?: (text: string | null) => void): Promise<RoutedStyle> => {
     if (setViewerInstruction) setViewerInstruction("SEQUENCING_VISUAL_DNA...");
     const ai = getAiClient();
     const imagePart = await fileToPart(imageFile, setViewerInstruction);
     const response = await ai.models.generateContent({
-        // Always use gemini-3-flash for text reasoning (free tier compatible)
         model: 'gemini-3-flash',
         contents: { parts: [{ text: "Extract Visual DNA and route to target module." }, imagePart] },
         config: {
@@ -251,9 +237,9 @@ export const describeImageForPrompt = async (imageFile: File | string, setViewer
     const ai = getAiClient();
     const imagePart = await fileToPart(imageFile, setViewerInstruction);
     const response = await ai.models.generateContent({
-        // Always use gemini-3-flash for text reasoning (free tier compatible)
         model: 'gemini-3-flash',
         contents: { parts: [{ text: "Describe the core subject and aesthetic of this image for a synthesis prompt." }, imagePart] },
     });
     return response.text || "";
 };
+            
