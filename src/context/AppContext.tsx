@@ -7,8 +7,8 @@ import React, { createContext, useState, ReactNode, useEffect, useCallback } fro
 import { audioService } from '../services/audioService';
 
 type Theme = 'dark' | 'light';
-// Updated to include 'gemini-1.5-pro' for advanced tasks
-export type ImageModel = 'gemini-1.5-flash' | 'gemini-1.5-pro'; 
+// Updated to include 'gemini-2.0-pro-exp-02-05' for advanced tasks
+export type ImageModel = 'gemini-3-flash' | 'gemini-2.0-pro-exp-02-05'; 
 
 interface AppContextType {
     isLoading: boolean;
@@ -35,7 +35,7 @@ export const AppContext = createContext<AppContextType>({
     toggleTheme: () => {},
     pixelRatio: 1,
     density: 'standard',
-    imageModel: 'gemini-1.5-flash', // Default value
+    imageModel: 'gemini-3-flash', // Default value
     // setImageModel: () => {}, // Removed
     isAudioMuted: false,
     toggleAudio: () => {},
@@ -51,7 +51,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     
     // imageModel state is still maintained to reflect the currently chosen model based on isFastAiEnabled
     // but not directly user-selectable via setImageModel
-    const [imageModel, setImageModel] = useState<ImageModel>('gemini-1.5-flash');
+    const [imageModel, setImageModel] = useState<ImageModel>('gemini-3-flash');
 
     const [isAudioMuted, setIsAudioMuted] = useState(() => {
         try {
@@ -73,9 +73,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     // Update imageModel based on isFastAiEnabled
     useEffect(() => {
         if (isFastAiEnabled) {
-            setImageModel('gemini-1.5-flash');
+            setImageModel('gemini-3-flash');
         } else {
-            setImageModel('gemini-1.5-pro');
+            setImageModel('gemini-2.0-pro-exp-02-05');
         }
     }, [isFastAiEnabled]);
 

@@ -157,7 +157,7 @@ export const App: React.FC = () => {
             let result: { imageUrl: string; groundingUrls?: { uri: string; title?: string }[] };
 
             // Dynamic model selection based on `isFastAiEnabled`
-            const imageGenerationModel = isFastAiEnabled ? 'gemini-1.5-flash' : 'gemini-1.5-pro'; 
+            const imageGenerationModel = isFastAiEnabled ? 'gemini-3-flash' : 'gemini-2.0-pro-exp-02-05'; 
 
             if (request.type === 'flux') {
                 if (sourceImage && !request.forceNew) { // If there's a source image (File or string) AND not forcing new

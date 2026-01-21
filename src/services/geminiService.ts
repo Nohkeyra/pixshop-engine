@@ -108,8 +108,8 @@ export const refineImagePrompt = async (prompt: string, useDeepThinking?: boolea
     try {
         if (setViewerInstruction) setViewerInstruction("REFINING_PROMPT_GRAMMAR...");
         const ai = getAiClient();
-        // Always use gemini-1.5-flash for text reasoning (free tier compatible)
-        const model = 'gemini-1.5-flash'; 
+        // Always use gemini-3-flash for text reasoning (free tier compatible)
+        const model = 'gemini-3-flash'; 
         
         const config: any = {};
         if (useDeepThinking) { // useDeepThinking can still be used to enable deeper thinking for flash model
@@ -134,15 +134,15 @@ export const refineImagePrompt = async (prompt: string, useDeepThinking?: boolea
 export const generateFluxTextToImage = async (prompt: string, config?: ImageGenerationConfig): Promise<ImageGenerationResult> => {
     if (config?.setViewerInstruction) config.setViewerInstruction("GENERATING_FLUX_FROM_TEXT...");
     const ai = getAiClient();
-    // Use model from config, fallback to gemini-1.5-flash
-    const model = config?.model || 'gemini-1.5-flash'; 
+    // Use model from config, fallback to gemini-3-flash
+    const model = config?.model || 'gemini-3-flash'; 
     const generationConfig: any = {
         systemInstruction: config?.systemInstructionOverride || PROTOCOLS.ARTIST,
         imageConfig: { aspectRatio: (config?.aspectRatio || '1:1') as any }
     };
     if (config?.useGoogleSearch) {
-        // googleSearch tool is only available for gemini-1.5-pro
-        if (model === 'gemini-1.5-pro') {
+        // googleSearch tool is only available for gemini-2.0-pro-exp-02-05
+        if (model === 'gemini-2.0-pro-exp-02-05') {
             generationConfig.tools = [{googleSearch: {}}];
         } else {
             console.warn("Google Search grounding requested but not supported by selected model:", model);
@@ -160,16 +160,16 @@ export const generateFluxTextToImage = async (prompt: string, config?: ImageGene
 export const generateFluxImage = async (source: File | string, prompt: string, config?: ImageGenerationConfig): Promise<ImageGenerationResult> => {
     if (config?.setViewerInstruction) config.setViewerInstruction("TRANSFORMING_VISUAL_FLUX...");
     const ai = getAiClient();
-    // Use model from config, fallback to gemini-1.5-flash
-    const model = config?.model || 'gemini-1.5-flash';
+    // Use model from config, fallback to gemini-3-flash
+    const model = config?.model || 'gemini-3-flash';
     const imagePart = await fileToPart(source, config?.setViewerInstruction);
     const generationConfig: any = {
         systemInstruction: config?.systemInstructionOverride || PROTOCOLS.IMAGE_TRANSFORMER, 
         imageConfig: { aspectRatio: (config?.aspectRatio || '1:1') as any }
     };
     if (config?.useGoogleSearch) {
-        // googleSearch tool is only available for gemini-1.5-pro
-        if (model === 'gemini-1.5-pro') {
+        // googleSearch tool is only available for gemini-2.0-pro-exp-02-05
+        if (model === 'gemini-2.0-pro-exp-02-05') {
             generationConfig.tools = [{googleSearch: {}}];
         } else {
             console.warn("Google Search grounding requested but not supported by selected model:", model);
@@ -187,16 +187,16 @@ export const generateFluxImage = async (source: File | string, prompt: string, c
 export const generateFilteredImage = async (source: File | string, prompt: string, config?: ImageGenerationConfig): Promise<ImageGenerationResult> => {
     if (config?.setViewerInstruction) config.setViewerInstruction("APPLYING_NEURAL_FILTERS...");
     const ai = getAiClient();
-    // Use model from config, fallback to gemini-1.5-flash
-    const model = config?.model || 'gemini-1.5-flash';
+    // Use model from config, fallback to gemini-3-flash
+    const model = config?.model || 'gemini-3-flash';
     const imagePart = await fileToPart(source, config?.setViewerInstruction);
     const generationConfig: any = {
         systemInstruction: config?.systemInstructionOverride || PROTOCOLS.EDITOR, 
         imageConfig: { aspectRatio: (config?.aspectRatio || '1:1') as any }
     };
     if (config?.useGoogleSearch) {
-        // googleSearch tool is only available for gemini-1.5-pro
-        if (model === 'gemini-1.5-pro') {
+        // googleSearch tool is only available for gemini-2.0-pro-exp-02-05
+        if (model === 'gemini-2.0-pro-exp-02-05') {
             generationConfig.tools = [{googleSearch: {}}];
         } else {
             console.warn("Google Search grounding requested but not supported by selected model:", model);
