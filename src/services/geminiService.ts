@@ -8,9 +8,11 @@ import { ImageModel } from '../context/AppContext'; // Import ImageModel type
 
 // Factory to always get the freshest instance
 const getAiClient = () => {
-    const apiKey = (import.meta as any).env.VITE_API_KEY || (process.env as any).API_KEY;
+    // Correct Vite syntax for environment variables
+    const apiKey = import.meta.env.VITE_API_KEY;
+    
     if (!apiKey) {
-        throw new Error("NEURAL_LINK_NULL: Authentication key missing. Initialize via System Config.");
+        throw new Error("NEURAL_LINK_NULL: Authentication key missing. Ensure VITE_API_KEY is set in Replit Secrets or GitHub Secrets.");
     }
     return new GoogleGenAI({ apiKey });
 };
