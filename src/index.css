@@ -1,0 +1,213 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Pixshop Core Colors - Neon Palette */
+  --color-matrix: #00FF9D;
+  --color-dna: #A855F7;
+  --color-flux: #FF2D55;
+  --color-filter: #00F0FF;
+  --color-type: #FF00FF;
+  --color-vector: #00FFCC;
+  --color-adjust: #FFCC00;
+  --color-buff: #3B82F6;
+  --color-lightning: #D8B4FE;
+
+  /* Global UI Colors */
+  --color-primary: #F8130D;
+  --color-secondary: #FB4606;
+  --color-highlight: var(--color-adjust);
+  --color-background: #000000;
+  --color-surface: #0A0A0A;
+  --color-surface-light: #111111;
+  --color-border: #222222;
+  --color-text: #FFFFFF;
+  --color-text-muted: #9CA3AF;
+
+  /* Typography */
+  --font-display: 'Koulen', sans-serif;
+  --font-mono: 'Orbitron', monospace;
+  --font-sans: 'Inter', sans-serif;
+  --font-marker: 'Rubik Wet Paint', cursive;
+
+  /* Environment */
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
+  --ui-density: 1;
+}
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+    height: 100dvh; /* Dynamic Viewport Height for Mobile */
+    width: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    overflow: hidden;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transform: translateZ(0); /* Hardware Acceleration */
+  }
+
+  /* Form Elements - HUD Style */
+  input[type="text"],
+  input[type="number"],
+  input[type="range"],
+  textarea,
+  select {
+    background-color: var(--color-background);
+    border: 2px solid var(--color-border);
+    color: var(--color-text);
+    padding: calc(0.75rem * var(--ui-density)) calc(1rem * var(--ui-density));
+    transition: all 0.2s ease-in-out;
+    font-family: var(--font-mono);
+    font-size: 16px; /* Prevents iOS zoom */
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  }
+
+  @media (min-width: 768px) {
+      input[type="text"],
+      input[type="number"],
+      textarea,
+      select {
+          font-size: calc(14px * var(--ui-density));
+      }
+  }
+
+  input[type="text"]:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 25px var(--color-primary), inset 0 0 10px var(--color-primary);
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #000; 
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #333; 
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary); 
+  }
+
+  /* Animations */
+  @keyframes terminal-flicker {
+    0%, 100% { opacity: 1; }
+    3% { opacity: 0.8; }
+    4% { opacity: 1; }
+    50% { opacity: 1; }
+    51% { opacity: 0.95; }
+    52% { opacity: 1; }
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display tracking-tight text-white uppercase italic;
+    animation: terminal-flicker 8s infinite step-end;
+    text-shadow: 0 0 15px rgba(255,255,255,0.7);
+  }
+}
+
+@layer components {
+  /* Branding */
+  .pixshop-wordmark {
+    font-family: var(--font-marker);
+    @apply uppercase tracking-tight leading-none select-none;
+    text-shadow: 4px 4px 0px rgba(0,0,0,1), 0 0 40px rgba(255,255,255,0.8);
+    background: linear-gradient(180deg, #ffffff 40%, #cccccc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Start Screen Logo */
+  .wildstyle-logo {
+    font-family: var(--font-marker);
+    @apply uppercase tracking-tighter;
+    text-shadow: 4px 4px 0px rgba(0,0,0,1), 0 0 40px rgba(255,255,255,0.8);
+    background: linear-gradient(180deg, #ffffff 40%, #cccccc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Panels */
+  .glass-panel {
+    @apply bg-zinc-950/90 backdrop-blur-xl border border-white/30 rounded-none;
+    box-shadow: 0 0 50px rgba(0,0,0,0.9), inset 0 0 30px rgba(255,255,255,0.1);
+  }
+
+  /* Labels */
+  .panel-label {
+    @apply text-[9px] font-mono font-black uppercase tracking-[0.25em] mb-1.5 block border-l-2 border-white/50 pl-2 leading-none opacity-80 mt-1 shadow-[0_0_15px_rgba(255,255,255,0.2)];
+  }
+
+  /* Main Action Button */
+  .execute-btn {
+    @apply w-full h-11 relative overflow-hidden bg-black border border-white/30 transition-all active:scale-95 flex items-center justify-center gap-3 group rounded-none;
+    box-shadow: 0 0 30px rgba(0,0,0,0.9), inset 0 0 15px rgba(255,255,255,0.05);
+  }
+
+  .execute-btn-glow {
+    @apply absolute inset-0 opacity-0 group-hover:opacity-60 transition-opacity duration-300 pointer-events-none;
+    filter: blur(15px);
+  }
+
+  /* Presets */
+  .preset-grid {
+    @apply grid grid-cols-2 gap-4 w-full items-stretch;
+  }
+
+  .preset-card {
+    @apply relative flex flex-col items-start justify-center p-2 
+           bg-white/[0.05] border border-white/[0.15] rounded-none 
+           transition-all duration-150 active:scale-[0.97] overflow-hidden w-full h-auto min-h-[2.75rem]
+           hover:border-white/50 hover:bg-white/[0.12] shadow-[0_0_8px_rgba(0,0,0,0.6)];
+  }
+
+  /* Effects */
+  .neural-scanlines {
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.1) 0px,
+      rgba(0,0,0,0.2) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+    pointer-events: none;
+  }
+
+  .cyber-grid {
+    background-image:
+      linear-gradient(var(--color-primary), 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-secondary), 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.15;
+  }
+
+  .asphalt-grid {
+    background-image: radial-gradient(circle, #ffffff 1px, transparent 1px);
+    background-size: 40px 40px;
+    box-shadow: 0 0 5px rgba(255,255,255,0.05) inset;
+  }
+}
+
+@layer utilities {
+  .gpu-accelerate {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    will-change: transform;
+  }
+}
