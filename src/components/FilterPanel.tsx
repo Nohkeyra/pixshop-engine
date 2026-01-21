@@ -22,7 +22,7 @@ interface FilterPanelProps {
   onRequest: (request: GenerationRequest) => void;
   isLoading: boolean;
   hasImage: boolean;
-  currentImageFile: string | null;
+  currentImageFile: File | string | null;
   initialPrompt?: string;
   setViewerInstruction: (text: string | null) => void;
 }

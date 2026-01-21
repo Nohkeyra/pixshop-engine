@@ -128,7 +128,8 @@ export const App: React.FC = () => {
         setViewerInstruction(null);
         audioService.playClick();
         setHistory(prev => {
-            const newHistory = [...prev.slice(0, historyIndex + 1), { content: file, type: 'upload', timestamp: Date.now() }];
+            const newItem: HistoryItem = { content: file, type: 'upload', timestamp: Date.now() };
+            const newHistory = [...prev.slice(0, historyIndex + 1), newItem];
             setHistoryIndex(newHistory.length - 1);
             return newHistory;
         });
@@ -199,13 +200,14 @@ export const App: React.FC = () => {
             }
             
             setHistory(prev => {
-                const newHistory = [...prev.slice(0, historyIndex + 1), { 
+                const newItem: HistoryItem = { 
                     content: result.imageUrl, 
                     prompt: request.prompt, 
                     type: request.type === 'flux' && request.forceNew ? 'generation' : 'transformation', 
                     timestamp: Date.now(),
                     groundingUrls: result.groundingUrls
-                }];
+                };
+                const newHistory = [...prev.slice(0, historyIndex + 1), newItem];
                 setHistoryIndex(newHistory.length - 1);
                 return newHistory;
             });
@@ -288,7 +290,7 @@ export const App: React.FC = () => {
     }, []);
 
     const handleRouteStyle = useCallback((style: RoutedStyle) => {
-        setActiveTab(style.target_panel_id);
+        setActiveTab(style.target_panel_id as ActiveTab);
         setPendingPrompt(style.preset_data.prompt);
         audioService.playClick();
     }, []);

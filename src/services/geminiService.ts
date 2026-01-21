@@ -8,8 +8,7 @@ import { ImageModel } from '../context/AppContext'; // Import ImageModel type
 
 // Factory to always get the freshest instance
 const getAiClient = () => {
-    const apiKey = 
-        import.meta.env.VITE_API_KEY;
+    const apiKey = (import.meta as any).env?.VITE_API_KEY || (process.env as any).API_KEY;
     if (!apiKey) {
         throw new Error("NEURAL_LINK_NULL: Authentication key missing. Initialize via System Config.");
     }
@@ -98,9 +97,6 @@ const handleApiResponse = (response: GenerateContentResponse, setViewerInstructi
         for (const chunk of response.candidates[0].groundingMetadata.groundingChunks) {
             if (chunk.web?.uri) {
                 groundingUrls.push({ uri: chunk.web.uri, title: chunk.web.title });
-            }
-            if (chunk.maps?.uri) { // Also handle Maps grounding, although not explicitly requested for this feature.
-                groundingUrls.push({ uri: chunk.maps.uri, title: chunk.maps.title });
             }
         }
     }

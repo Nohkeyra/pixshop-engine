@@ -18,7 +18,15 @@ interface LightPanelProps {
   hasImage: boolean; // Added prop to check if there's an image in viewer
 }
 
-const PRESETS = [
+interface LightPreset {
+  name: string;
+  description: string;
+  prompt: string;
+  id?: string;
+  isCustom?: boolean;
+}
+
+const PRESETS: LightPreset[] = [
     { name: 'Studio', description: 'Clean, soft shadows, neutral tones.', prompt: 'Professional studio lighting, soft shadows, neutral.' },
     { name: 'Golden Hour', description: 'Warm, diffused glow.', prompt: 'Golden hour lighting, warm color temperature, diffused sunlight.' },
     { name: 'Cyberpunk', description: 'Teal & magenta neon.', prompt: 'Cyberpunk color grading, strong teal and magenta tones, high contrast.' },
@@ -55,8 +63,8 @@ export const LightPanel = React.memo((({ onRequest, isLoading, currentMediaUrl, 
     return () => window.removeEventListener('stylePresetsUpdated', loadPresets);
   }, [loadPresets]);
 
-  const allPresets = useMemo(() => {
-      const formattedCustom = customPresets.map(p => ({
+  const allPresets = useMemo((): LightPreset[] => {
+      const formattedCustom: LightPreset[] = customPresets.map(p => ({
           name: p.name,
           description: p.description,
           prompt: p.applyPrompt || p.genPrompt,
