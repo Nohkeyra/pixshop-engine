@@ -1,8 +1,11 @@
-name: Replit Android Build
+name: Pixshop Engine CI
 
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -12,21 +15,21 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
       with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: gradle
+        node-version: '20'
+        cache: 'npm'
 
-    - name: Grant Execute Permission
-      run: chmod +x gradlew
+    - name: Install Dependencies
+      run: npm install
 
-    - name: Build with Gradle
-      run: ./gradlew assembleDebug --stacktrace
+    - name: Build Project
+      run: npm run build --if-present
 
-    - name: Upload APK
+    - name: Upload Build Output
       uses: actions/upload-artifact@v4
       with:
-        name: pixshop-engine-replit-build
-        path: "**/build/outputs/apk/debug/*.apk"
+        name: pixshop-dist
+        path: dist/
+        
