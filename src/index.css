@@ -155,8 +155,12 @@
 
   /* Main Action Button */
   .execute-btn {
-    @apply w-full h-11 relative overflow-hidden bg-black border border-white/30 transition-all active:scale-95 flex items-center justify-center gap-3 group rounded-none;
+    @apply w-full h-11 relative overflow-hidden bg-black border border-white/30 transition-all active:scale-95 flex items-center justify-center gap-3 rounded-none;
     box-shadow: 0 0 30px rgba(0,0,0,0.9), inset 0 0 15px rgba(255,255,255,0.05);
+  }
+
+  .execute-btn.group:hover {
+    /* Manual hover styles if needed or handle in JSX */
   }
 
   .execute-btn-glow {
