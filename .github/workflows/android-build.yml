@@ -25,6 +25,10 @@ jobs:
         npm ci
       working-directory: ./
 
+    - name: Build Web Assets
+      run: npm run build
+      working-directory: ./
+
     - name: Sync Capacitor Android
       run: npx cap sync android
       working-directory: ./
@@ -42,7 +46,6 @@ jobs:
 
     - name: Find and Build APK
       run: |
-        # Locate the gradlew file dynamically
         GRADLEW_PATH=$(find . -name gradlew | head -n 1)
         if [ -z "$GRADLEW_PATH" ]; then
           echo "Error: gradlew not found in the repository."
@@ -50,8 +53,6 @@ jobs:
         fi
         GRADLEW_DIR=$(dirname "$GRADLEW_PATH")
         echo "Found gradlew in: $GRADLEW_DIR"
-        
-        # Grant permissions and execute build
         chmod +x "$GRADLEW_PATH"
         cd "$GRADLEW_DIR" && ./gradlew assembleDebug --warning-mode all
 
