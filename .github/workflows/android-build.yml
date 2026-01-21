@@ -20,7 +20,13 @@ jobs:
         cache: 'npm'
 
     - name: Install npm dependencies
-      run: npm ci
+      run: |
+        npm install --save-dev @capacitor/cli
+        npm ci
+      working-directory: ./
+
+    - name: Sync Capacitor Android
+      run: npx cap sync android
       working-directory: ./
 
     - name: Set up JDK 17
