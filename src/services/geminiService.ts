@@ -117,7 +117,7 @@ export const refineImagePrompt = async (prompt: string, useDeepThinking?: boolea
     try {
         if (setViewerInstruction) setViewerInstruction("REFINING_PROMPT_GRAMMAR...");
         const ai = getAiClient();
-        const model = 'gemini-3-flash'; 
+        const model = 'gemini-2.5-flash-lite'; 
         
         const config: any = {};
         if (useDeepThinking) {
@@ -142,7 +142,7 @@ export const refineImagePrompt = async (prompt: string, useDeepThinking?: boolea
 export const generateFluxTextToImage = async (prompt: string, config?: ImageGenerationConfig): Promise<ImageGenerationResult> => {
     if (config?.setViewerInstruction) config.setViewerInstruction("GENERATING_FLUX_FROM_TEXT...");
     const ai = getAiClient();
-    const model = config?.model || 'gemini-3-flash'; 
+    const model = config?.model || 'gemini-2.5-flash'; 
     const generationConfig: any = {
         systemInstruction: config?.systemInstructionOverride || PROTOCOLS.ARTIST,
         imageConfig: { aspectRatio: (config?.aspectRatio || '1:1') as any }
@@ -166,7 +166,7 @@ export const generateFluxTextToImage = async (prompt: string, config?: ImageGene
 export const generateFluxImage = async (source: File | string, prompt: string, config?: ImageGenerationConfig): Promise<ImageGenerationResult> => {
     if (config?.setViewerInstruction) config.setViewerInstruction("TRANSFORMING_VISUAL_FLUX...");
     const ai = getAiClient();
-    const model = config?.model || 'gemini-3-flash';
+    const model = config?.model || 'gemini-2.5-flash';
     const imagePart = await fileToPart(source, config?.setViewerInstruction);
     const generationConfig: any = {
         systemInstruction: config?.systemInstructionOverride || PROTOCOLS.IMAGE_TRANSFORMER, 
@@ -191,7 +191,7 @@ export const generateFluxImage = async (source: File | string, prompt: string, c
 export const generateFilteredImage = async (source: File | string, prompt: string, config?: ImageGenerationConfig): Promise<ImageGenerationResult> => {
     if (config?.setViewerInstruction) config.setViewerInstruction("APPLYING_NEURAL_FILTERS...");
     const ai = getAiClient();
-    const model = config?.model || 'gemini-3-flash';
+    const model = config?.model || 'gemini-2.5-flash';
     const imagePart = await fileToPart(source, config?.setViewerInstruction);
     const generationConfig: any = {
         systemInstruction: config?.systemInstructionOverride || PROTOCOLS.EDITOR, 
@@ -218,7 +218,7 @@ export const extractStyleFromImage = async (imageFile: File | string, setViewerI
     const ai = getAiClient();
     const imagePart = await fileToPart(imageFile, setViewerInstruction);
     const response = await ai.models.generateContent({
-        model: 'gemini-3-flash',
+        model: 'gemini-3-pro-preview',
         contents: { parts: [{ text: "Extract Visual DNA and route to target module." }, imagePart] },
         config: {
             systemInstruction: PROTOCOLS.STYLE_ROUTER,
@@ -245,7 +245,7 @@ export const describeImageForPrompt = async (imageFile: File | string, setViewer
     const ai = getAiClient();
     const imagePart = await fileToPart(imageFile, setViewerInstruction);
     const response = await ai.models.generateContent({
-        model: 'gemini-3-flash',
+        model: 'gemini-2.5-flash-lite',
         contents: { parts: [{ text: "Describe the core subject and aesthetic of this image for a synthesis prompt." }, imagePart] },
     });
     return response.text || "";
