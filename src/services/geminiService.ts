@@ -242,4 +242,4 @@ export const describeImageForPrompt = async (imageFile: File | string, setViewer
     });
     return response.text || "";
 };
-            
+    
