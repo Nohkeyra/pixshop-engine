@@ -27,6 +27,8 @@ jobs:
 
     - name: Build Web Assets
       run: npm run build
+      env:
+        [span_34](start_span)VITE_API_KEY: ${{ secrets.VITE_API_KEY }} # Bakes the key into the web build[span_34](end_span)
       working-directory: ./
 
     - name: Sync Capacitor Android
