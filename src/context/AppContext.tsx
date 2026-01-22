@@ -91,22 +91,36 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const updateMetrics = useCallback(() => {
         const pr = window.devicePixelRatio || 1;
         const width = window.innerWidth;
+        const height = window.innerHeight;
         setPixelRatio(pr);
         
-        // Accurate Mobile Detection using matchMedia
-        const mobileCheck = window.matchMedia('(max-width: 768px)').matches;
+        // Comprehensive Device Detection
+        const userAgent = navigator.userAgent.toLowerCase();
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const mobileCheck = window.matchMedia('(max-width: 1024px)').matches || /iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(userAgent);
+        
         setIsMobile(mobileCheck);
 
+        // Density Logic based on Resolution and DPI
         let d: 'compact' | 'standard' | 'large' = 'standard';
-        // Tailored for mobile viewports (e.g. Pixel 7 is ~412px width)
-        if (width < 640) {
-            d = 'compact';
-        } else if (width > 1400) {
-            d = 'large';
+        
+        if (width < 640 || (isTouchDevice && width < 1024)) {
+            d = 'compact'; // Mobile/Small Tablet
+        } else if (width > 1920 || pr > 2) {
+            d = 'large'; // High DPI or UltraWide
         }
         
         setDensity(d);
-        document.documentElement.style.setProperty('--ui-density', d === 'compact' ? '0.8' : (d === 'large' ? '1.1' : '1'));
+        
+        // Set CSS variables for fluid typography and spacing
+        const root = document.documentElement;
+        root.style.setProperty('--ui-density', d === 'compact' ? '0.85' : (d === 'large' ? '1.15' : '1'));
+        root.style.setProperty('--vh', `${height * 0.01}px`);
+        root.style.setProperty('--dpr', pr.toString());
+        
+        // Add specific classes to body for CSS targeting
+        document.body.classList.toggle('is-mobile', mobileCheck);
+        document.body.classList.toggle('is-high-dpi', pr > 1);
     }, []);
 
     useEffect(() => {

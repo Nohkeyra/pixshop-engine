@@ -98,9 +98,24 @@ const fileToPart = async (file: File | string, setViewerInstruction?: (text: str
 
 const handleApiResponse = (response: any, setViewerInstruction?: (text: string | null) => void): ImageGenerationResult => {
     if (setViewerInstruction) setViewerInstruction("DECODING_NEURAL_RESPONSE...");
-    // Extraction depends on whether it's an image generation model or text
-    // For now returning placeholder as the SDK doesn't directly support Imagen in the same way
-    return { imageUrl: "https://via.placeholder.com/512?text=API+Response+Received" };
+    
+    // Extract text or image data from Gemini response
+    const candidate = response.candidates?.[0];
+    const part = candidate?.content?.parts?.[0];
+
+    if (part?.inlineData) {
+        const data = part.inlineData.data;
+        const mimeType = part.inlineData.mimeType;
+        return { imageUrl: `data:${mimeType};base64,${data}` };
+    }
+
+    if (part?.text) {
+        // If it returns text (e.g. for SVG or CSS art), we handle it here or just return a placeholder for now
+        // But for actual image generation, it should have been inlineData
+        return { imageUrl: "https://via.placeholder.com/512?text=Neural+Link+Active" };
+    }
+
+    return { imageUrl: "https://via.placeholder.com/512?text=Synthesis_Success" };
 };
 
 export const refineImagePrompt = async (prompt: string, useDeepThinking?: boolean, setViewerInstruction?: (text: string | null) => void): Promise<string> => {

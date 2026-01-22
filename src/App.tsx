@@ -295,16 +295,29 @@ export const App: React.FC = () => {
         audioService.playClick();
     }, []);
 
-    const handleDownloadImage = useCallback(() => {
-        if (currentMediaUrl) {
+    const handleDownloadImage = useCallback(async () => {
+        if (!currentMediaUrl) return;
+        
+        try {
+            audioService.playClick();
+            
+            // Check if it's a blob or data URL
+            const response = await fetch(currentMediaUrl);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            
             const link = document.createElement('a');
-            link.href = currentMediaUrl;
+            link.href = url;
             link.download = `pixshop_export_${Date.now()}.png`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            audioService.playClick();
+            window.URL.revokeObjectURL(url);
+            
             triggerFeedback(setDownloadFeedbackStatus);
+        } catch (err) {
+            console.error("SAVE_FAULT:", err);
+            setError("SAVE_FAULT: Unable to write to local storage.");
         }
     }, [currentMediaUrl, triggerFeedback]);
 
