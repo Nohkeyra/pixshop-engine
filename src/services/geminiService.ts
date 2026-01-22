@@ -30,10 +30,16 @@ const sanitizeModel = (m?: string): string => {
     const normalized = trimmed.replace(/\s+/g, '-');
     
     // Map experimental or deprecated models to stable ones
+    // Check for 1.5 versions first
+    if (normalized.includes('1.5-flash')) return 'gemini-1.5-flash';
+    if (normalized.includes('1.5-pro')) return 'gemini-1.5-pro';
+    
+    // Fallback mappings for other versions
     if (normalized.includes('gemini-3-flash')) return 'gemini-1.5-flash';
     if (normalized.includes('gemini-2.0-pro-exp')) return 'gemini-1.5-pro';
     
-    return normalized;
+    // Default to gemini-1.5-flash if no match
+    return 'gemini-1.5-flash';
 };
 
 export const PROTOCOLS = {
