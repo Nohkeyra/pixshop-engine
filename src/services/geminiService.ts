@@ -9,7 +9,7 @@ import type { ImageModel } from '../context/AppContext';
 // Factory to always get the freshest instance
 const getAiClient = () => {
     // Access Vite environment variables correctly
-    const apiKey = import.meta.env.VITE_API_KEY;
+    const apiKey = (import.meta as any).env.VITE_API_KEY;
     
     if (!apiKey) {
         throw new Error("NEURAL_LINK_NULL: Authentication key missing. Initialize via System Config.");
@@ -213,10 +213,17 @@ export const extractStyleFromImage = async (imageFile: File | string, setViewerI
             responseSchema: {
                 type: SchemaType.OBJECT,
                 properties: {
-                    target_panel_id: { type: SchemaType.STRING, enum: ['filter_panel', 'vector_art_panel', 'typographic_panel'] },
+                    target_panel_id: { 
+                        type: SchemaType.STRING, 
+                        enum: ['filter_panel', 'vector_art_panel', 'typographic_panel'] 
+                    } as any,
                     preset_data: {
                         type: SchemaType.OBJECT,
-                        properties: { name: { type: SchemaType.STRING }, description: { type: SchemaType.STRING }, prompt: { type: SchemaType.STRING } },
+                        properties: { 
+                            name: { type: SchemaType.STRING }, 
+                            description: { type: SchemaType.STRING }, 
+                            prompt: { type: SchemaType.STRING } 
+                        },
                         required: ['name', 'description', 'prompt']
                     }
                 },
