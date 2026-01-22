@@ -23,23 +23,22 @@ const getAiClient = () => {
  *   "/gemini-3- flash" -> "gemini-3-flash"
  */
 const sanitizeModel = (m?: string): string => {
-    if (!m) return 'gemini-1.5-flash';
+    if (!m) return 'gemini-2.5-flash';
     // trim, remove leading slashes, and collapse whitespace
     const trimmed = m.toString().trim().replace(/^\/*/, '');
     // replace any internal whitespace with a single dash:
     const normalized = trimmed.replace(/\s+/g, '-');
     
-    // Map experimental or deprecated models to stable ones
-    // Check for 1.5 versions first
-    if (normalized.includes('1.5-flash')) return 'gemini-1.5-flash';
-    if (normalized.includes('1.5-pro')) return 'gemini-1.5-pro';
+    // Prioritize 2.5 versions
+    if (normalized.includes('2.5-flash')) return 'gemini-2.5-flash';
+    if (normalized.includes('2.5-pro')) return 'gemini-2.5-pro';
     
-    // Fallback mappings for other versions
-    if (normalized.includes('gemini-3-flash')) return 'gemini-1.5-flash';
-    if (normalized.includes('gemini-2.0-pro-exp')) return 'gemini-1.5-pro';
+    // Map experimental or older models to 2.5 stable versions
+    if (normalized.includes('1.5-flash') || normalized.includes('gemini-3-flash')) return 'gemini-2.5-flash';
+    if (normalized.includes('1.5-pro') || normalized.includes('gemini-2.0-pro-exp')) return 'gemini-2.5-pro';
     
-    // Default to gemini-1.5-flash if no match
-    return 'gemini-1.5-flash';
+    // Default to gemini-2.5-flash for everything else to ensure high quality
+    return 'gemini-2.5-flash';
 };
 
 export const PROTOCOLS = {
