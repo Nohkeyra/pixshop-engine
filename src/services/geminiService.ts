@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from "@google/generative-ai";
+import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory, SchemaType } from "@google/generative-ai";
 import type { ImageModel } from '../context/AppContext';
 
 // Factory to always get the freshest instance
 const getAiClient = () => {
-    // Cast to any to fix TS2339 and access Vite environment variables
-    const apiKey = (import.meta as any).env?.VITE_API_KEY;
+    // Access Vite environment variables correctly
+    const apiKey = import.meta.env.VITE_API_KEY;
     
     if (!apiKey) {
         throw new Error("NEURAL_LINK_NULL: Authentication key missing. Initialize via System Config.");
@@ -172,70 +172,51 @@ export const generateFluxTextToImage = async (prompt: string, config?: ImageGene
 export const generateFluxImage = async (source: File | string, prompt: string, config?: ImageGenerationConfig): Promise<ImageGenerationResult> => {
     if (config?.setViewerInstruction) config.setViewerInstruction("TRANSFORMING_VISUAL_FLUX...");
     const ai = getAiClient();
-    const model = config?.model || 'gemini-2.5-flash';
+    const modelId = sanitizeModel(config?.model || 'gemini-1.5-flash');
     const imagePart = await fileToPart(source, config?.setViewerInstruction);
-    const generationConfig: any = {
-        systemInstruction: config?.systemInstructionOverride || PROTOCOLS.IMAGE_TRANSFORMER, 
-        imageConfig: { aspectRatio: (config?.aspectRatio || '1:1') as any }
-    };
-    if (config?.useGoogleSearch) {
-        if (model === 'gemini-2.0-pro-exp-02-05') {
-            generationConfig.tools = [{googleSearch: {}}];
-        } else {
-            console.warn("Google Search grounding requested but not supported by selected model:", model);
-        }
-    }
-
-    const response = await ai.models.generateContent({
-        model,
-        contents: { parts: [{ text: prompt }, imagePart] },
-        config: generationConfig
+    
+    const model = ai.getGenerativeModel({
+        model: modelId,
+        systemInstruction: config?.systemInstructionOverride || PROTOCOLS.IMAGE_TRANSFORMER,
     });
-    return handleApiResponse(response, config?.setViewerInstruction);
+
+    const result = await model.generateContent([prompt, imagePart]);
+    return handleApiResponse(result.response, config?.setViewerInstruction);
 };
 
 export const generateFilteredImage = async (source: File | string, prompt: string, config?: ImageGenerationConfig): Promise<ImageGenerationResult> => {
     if (config?.setViewerInstruction) config.setViewerInstruction("APPLYING_NEURAL_FILTERS...");
     const ai = getAiClient();
-    const model = config?.model || 'gemini-2.5-flash';
+    const modelId = sanitizeModel(config?.model || 'gemini-1.5-flash');
     const imagePart = await fileToPart(source, config?.setViewerInstruction);
-    const generationConfig: any = {
-        systemInstruction: config?.systemInstructionOverride || PROTOCOLS.EDITOR, 
-        imageConfig: { aspectRatio: (config?.aspectRatio || '1:1') as any }
-    };
-    if (config?.useGoogleSearch) {
-        if (model === 'gemini-2.0-pro-exp-02-05') {
-            generationConfig.tools = [{googleSearch: {}}];
-        } else {
-            console.warn("Google Search grounding requested but not supported by selected model:", model);
-        }
-    }
     
-    const response = await ai.models.generateContent({
-        model,
-        contents: { parts: [{ text: prompt }, imagePart] },
-        config: generationConfig
+    const model = ai.getGenerativeModel({
+        model: modelId,
+        systemInstruction: config?.systemInstructionOverride || PROTOCOLS.EDITOR,
     });
-    return handleApiResponse(response, config?.setViewerInstruction);
+    
+    const result = await model.generateContent([prompt, imagePart]);
+    return handleApiResponse(result.response, config?.setViewerInstruction);
 };
 
 export const extractStyleFromImage = async (imageFile: File | string, setViewerInstruction?: (text: string | null) => void): Promise<RoutedStyle> => {
     if (setViewerInstruction) setViewerInstruction("SEQUENCING_VISUAL_DNA...");
     const ai = getAiClient();
     const imagePart = await fileToPart(imageFile, setViewerInstruction);
-    const response = await ai.models.generateContent({
-        model: 'gemini-3-pro-preview',
-        contents: { parts: [{ text: "Extract Visual DNA and route to target module." }, imagePart] },
-        config: {
-            systemInstruction: PROTOCOLS.STYLE_ROUTER,
+    const modelId = 'gemini-1.5-flash';
+    
+    const model = ai.getGenerativeModel({
+        model: modelId,
+        systemInstruction: PROTOCOLS.STYLE_ROUTER,
+        generationConfig: {
             responseMimeType: "application/json",
             responseSchema: {
-                type: Type.OBJECT,
+                type: SchemaType.OBJECT,
                 properties: {
-                    target_panel_id: { type: Type.STRING, enum: ['filter_panel', 'vector_art_panel', 'typographic_panel'] },
+                    target_panel_id: { type: SchemaType.STRING, enum: ['filter_panel', 'vector_art_panel', 'typographic_panel'] },
                     preset_data: {
-                        type: Type.OBJECT,
-                        properties: { name: { type: Type.STRING }, description: { type: Type.STRING }, prompt: { type: Type.STRING } },
+                        type: SchemaType.OBJECT,
+                        properties: { name: { type: SchemaType.STRING }, description: { type: SchemaType.STRING }, prompt: { type: SchemaType.STRING } },
                         required: ['name', 'description', 'prompt']
                     }
                 },
@@ -243,16 +224,18 @@ export const extractStyleFromImage = async (imageFile: File | string, setViewerI
             }
         }
     });
-    return JSON.parse(response.text || '{}');
+
+    const result = await model.generateContent(["Extract Visual DNA and route to target module.", imagePart]);
+    return JSON.parse(result.response.text() || '{}');
 };
 
 export const describeImageForPrompt = async (imageFile: File | string, setViewerInstruction?: (text: string | null) => void): Promise<string> => {
     if (setViewerInstruction) setViewerInstruction("ANALYZING_IMAGE_GEOMETRY...");
     const ai = getAiClient();
     const imagePart = await fileToPart(imageFile, setViewerInstruction);
-    const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-lite',
-        contents: { parts: [{ text: "Describe the core subject and aesthetic of this image for a synthesis prompt." }, imagePart] },
-    });
-    return response.text || "";
+    const modelId = 'gemini-1.5-flash';
+    
+    const model = ai.getGenerativeModel({ model: modelId });
+    const result = await model.generateContent(["Describe the core subject and aesthetic of this image for a synthesis prompt.", imagePart]);
+    return result.response.text() || "";
 };
