@@ -28,6 +28,11 @@ const sanitizeModel = (m?: string): string => {
     const trimmed = m.toString().trim().replace(/^\/*/, '');
     // replace any internal whitespace with a single dash:
     const normalized = trimmed.replace(/\s+/g, '-');
+    
+    // Map experimental or deprecated models to stable ones
+    if (normalized.includes('gemini-3-flash')) return 'gemini-1.5-flash';
+    if (normalized.includes('gemini-2.0-pro-exp')) return 'gemini-1.5-pro';
+    
     return normalized;
 };
 
